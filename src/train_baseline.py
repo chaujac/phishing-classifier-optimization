@@ -1,182 +1,118 @@
-# src/train_baseline.py
-
-from pathlib import Path
-import argparse
 import json
-import time
 
-import joblib
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 
-from data_preprocessing import (
-    preprocess_and_split,
+from common import (
+    DATASETS,
+    MODEL_DIR,
+    RESULT_DIR,
     RANDOM_STATE,
+    ensure_directories,
+    save_model,
+    save_json,
 )
 
-
-DATASETS = {
-    "uci": {
-        "path": "data/uci_phishing.csv",
-        "target": None,
-    },
-    "web_page": {
-        "path": "data/web_page_phishing.csv",
-        "target": None,
-    },
-    "phiusil": {
-        "path": "data/phiusil.csv",
-        "target": None,
-    },
-    "zenodo": {
-        "path": "data/zenodo_phishing.csv",
-        "target": None,
-    },
-}
+from data_preprocessing import get_dataset_split
 
 
-MODEL_DIR = Path("models")
-MODEL_DIR.mkdir(parents=True, exist_ok=True)
+# ============================================================
+# BASELINE TRAINING
+# ============================================================
 
+def train_random_forest(dataset_name):
+    split = get_dataset_split(dataset_name)
 
-def train_random_forest(X_train, y_train):
-    """
-    E1: Random Forest using library defaults.
-    """
-    model = RandomForestClassifier()
+    X_train = split["X_train"]
+    y_train = split["y_train"]
 
-    start = time.perf_counter()
-    model.fit(X_train, y_train)
-    training_time = time.perf_counter() - start
+    model = RandomForestClassifier(
+        random_state=RANDOM_STATE
+    )
 
-    return model, training_time
-
-
-def train_xgboost(X_train, y_train):
-    """
-    E4: XGBoost using library defaults.
-    """
-    model = XGBClassifier()
-
-    start = time.perf_counter()
-    model.fit(X_train, y_train)
-    training_time = time.perf_counter() - start
-
-    return model, training_time
-
-
-def run_dataset(dataset_name):
-    config = DATASETS[dataset_name]
-
-    (
+    model.fit(
         X_train,
-        X_test,
         y_train,
-        y_test,
-        metadata,
-    ) = preprocess_and_split(
-        path=config["path"],
-        dataset_name=dataset_name,
-        target_column=config["target"],
-        random_state=RANDOM_STATE,
     )
 
-    print(
-        f"\nDataset: {dataset_name}"
-        f"\nTraining samples: {len(X_train)}"
-        f"\nTest samples: {len(X_test)}"
-        f"\nFeatures: {X_train.shape[1]}"
+    model_path = (
+        MODEL_DIR
+        / f"{dataset_name}_E1_random_forest.joblib"
     )
 
-    # ------------------------------------------------------------
-    # E1 - Random Forest
-    # ------------------------------------------------------------
-    rf_model, rf_training_time = train_random_forest(
-        X_train,
-        y_train
+    save_model(
+        model,
+        model_path,
     )
 
-    rf_path = MODEL_DIR / f"{dataset_name}_E1_RF.joblib"
-
-    joblib.dump(
-        rf_model,
-        rf_path
-    )
-
-    # ------------------------------------------------------------
-    # E4 - XGBoost
-    # ------------------------------------------------------------
-    xgb_model, xgb_training_time = train_xgboost(
-        X_train,
-        y_train
-    )
-
-    xgb_path = MODEL_DIR / f"{dataset_name}_E4_XGB.joblib"
-
-    joblib.dump(
-        xgb_model,
-        xgb_path
-    )
-
-    # Save the test partition so E1-E6 can be evaluated on exactly
-    # the same held-out observations.
-    split_path = MODEL_DIR / f"{dataset_name}_split.joblib"
-
-    joblib.dump(
-        {
-            "X_test": X_test,
-            "y_test": y_test,
-            "feature_names": list(X_train.columns),
-            "metadata": metadata,
-        },
-        split_path
-    )
-
-    results = {
+    metadata = {
         "dataset": dataset_name,
-        "E1": {
-            "model": str(rf_path),
-            "training_time_seconds": rf_training_time,
-        },
-        "E4": {
-            "model": str(xgb_path),
-            "training_time_seconds": xgb_training_time,
-        },
-        "preprocessing": metadata,
+        "experiment": "E1",
+        "classifier": "Random Forest",
+        "optimizer": "Default",
+        "parameters": model.get_params(),
     }
 
-    result_path = (
-        MODEL_DIR /
-        f"{dataset_name}_baseline_metadata.json"
+    save_json(
+        metadata,
+        RESULT_DIR
+        / f"{dataset_name}_E1_training.json",
     )
 
-    with open(result_path, "w", encoding="utf-8") as file:
-        json.dump(
-            results,
-            file,
-            indent=4
-        )
 
-    print(f"E1 saved to: {rf_path}")
-    print(f"E4 saved to: {xgb_path}")
+def train_xgboost(dataset_name):
+    split = get_dataset_split(dataset_name)
 
-    return results
+    X_train = split["X_train"]
+    y_train = split["y_train"]
 
-
-def main():
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "--dataset",
-        choices=list(DATASETS.keys()),
-        required=True,
-        help="Dataset to train."
+    model = XGBClassifier(
+        random_state=RANDOM_STATE,
+        eval_metric="logloss",
     )
 
-    args = parser.parse_args()
+    model.fit(
+        X_train,
+        y_train,
+    )
 
-    run_dataset(args.dataset)
+    model_path = (
+        MODEL_DIR
+        / f"{dataset_name}_E4_xgboost.joblib"
+    )
 
+    save_model(
+        model,
+        model_path,
+    )
+
+    metadata = {
+        "dataset": dataset_name,
+        "experiment": "E4",
+        "classifier": "XGBoost",
+        "optimizer": "Default",
+        "parameters": model.get_params(),
+    }
+
+    save_json(
+        metadata,
+        RESULT_DIR
+        / f"{dataset_name}_E4_training.json",
+    )
+
+
+# ============================================================
+# MAIN
+# ============================================================
 
 if __name__ == "__main__":
-    main()
+    ensure_directories()
+
+    for dataset_name in DATASETS:
+        print(f"\nTraining E1: {dataset_name}")
+        train_random_forest(dataset_name)
+
+        print(f"Training E4: {dataset_name}")
+        train_xgboost(dataset_name)
+
+    print("\nBaseline training complete.")

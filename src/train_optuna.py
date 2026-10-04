@@ -1,12 +1,5 @@
-# src/train_optuna.py
-
-from pathlib import Path
-import argparse
-import json
 import time
 
-import joblib
-import numpy as np
 import optuna
 
 from sklearn.ensemble import RandomForestClassifier
@@ -14,111 +7,76 @@ from sklearn.model_selection import (
     StratifiedKFold,
     cross_val_score,
 )
+
 from xgboost import XGBClassifier
 
-from data_preprocessing import (
-    preprocess_and_split,
+from common import (
+    DATASETS,
+    MODEL_DIR,
+    RESULT_DIR,
     RANDOM_STATE,
+    CV_FOLDS,
+    N_OPTUNA_TRIALS,
+    RF_OPTUNA,
+    XGB_OPTUNA,
+    ensure_directories,
+    save_model,
+    save_json,
 )
 
-
-DATASETS = {
-    "uci": {
-        "path": "data/uci_phishing.csv",
-        "target": None,
-    },
-    "web_page": {
-        "path": "data/web_page_phishing.csv",
-        "target": None,
-    },
-    "phiusil": {
-        "path": "data/phiusil.csv",
-        "target": None,
-    },
-    "zenodo": {
-        "path": "data/zenodo_phishing.csv",
-        "target": None,
-    },
-}
+from data_preprocessing import get_dataset_split
 
 
-MODEL_DIR = Path("models")
-MODEL_DIR.mkdir(parents=True, exist_ok=True)
-
-
-N_TRIALS = 50
-
+# ============================================================
+# CROSS-VALIDATION
+# ============================================================
 
 CV = StratifiedKFold(
-    n_splits=5,
+    n_splits=CV_FOLDS,
     shuffle=True,
-    random_state=RANDOM_STATE
+    random_state=RANDOM_STATE,
 )
 
 
-def rf_complexity(params):
-    return (
-        params["n_estimators"] *
-        params["max_depth"]
-    )
-
-
-def xgb_complexity(params):
-    return (
-        params["n_estimators"] *
-        params["max_depth"]
-    )
-
+# ============================================================
+# RANDOM FOREST OPTUNA
+# ============================================================
 
 def optimize_random_forest(
     X_train,
-    y_train
+    y_train,
 ):
-    """
-    E3: Random Forest optimized using Optuna TPE.
-
-    Thesis-defined Optuna search space:
-        n_estimators: 100-300
-        max_depth: 10-30
-        min_samples_split: 2-10
-        min_samples_leaf: 1-4
-        max_features: sqrt/log2
-    """
-
     def objective(trial):
         params = {
             "n_estimators": trial.suggest_int(
                 "n_estimators",
-                100,
-                300
+                RF_OPTUNA["n_estimators"][0],
+                RF_OPTUNA["n_estimators"][1],
             ),
-
             "max_depth": trial.suggest_int(
                 "max_depth",
-                10,
-                30
+                RF_OPTUNA["max_depth"][0],
+                RF_OPTUNA["max_depth"][1],
             ),
-
             "min_samples_split": trial.suggest_int(
                 "min_samples_split",
-                2,
-                10
+                RF_OPTUNA["min_samples_split"][0],
+                RF_OPTUNA["min_samples_split"][1],
             ),
-
             "min_samples_leaf": trial.suggest_int(
                 "min_samples_leaf",
-                1,
-                4
+                RF_OPTUNA["min_samples_leaf"][0],
+                RF_OPTUNA["min_samples_leaf"][1],
             ),
-
             "max_features": trial.suggest_categorical(
                 "max_features",
-                ["sqrt", "log2"]
+                RF_OPTUNA["max_features"],
             ),
         }
 
         model = RandomForestClassifier(
-            **params
+            random_state=RANDOM_STATE,
+            **params,
         )
 
         scores = cross_val_score(
@@ -130,7 +88,7 @@ def optimize_random_forest(
             n_jobs=-1,
         )
 
-        return float(scores.mean())
+        return scores.mean()
 
     sampler = optuna.samplers.TPESampler(
         seed=RANDOM_STATE
@@ -141,112 +99,65 @@ def optimize_random_forest(
         sampler=sampler,
     )
 
-    start = time.perf_counter()
+    start_time = time.perf_counter()
 
     study.optimize(
         objective,
-        n_trials=N_TRIALS,
-        show_progress_bar=False,
+        n_trials=N_OPTUNA_TRIALS,
     )
 
     optimization_time = (
-        time.perf_counter() - start
-    )
-
-    # ------------------------------------------------------------
-    # Thesis tie-breaking rule
-    # ------------------------------------------------------------
-    completed_trials = [
-        trial
-        for trial in study.trials
-        if trial.state == optuna.trial.TrialState.COMPLETE
-    ]
-
-    if not completed_trials:
-        raise RuntimeError(
-            "Optuna completed no valid trials."
-        )
-
-    completed_trials.sort(
-        key=lambda trial: (
-            -trial.value,
-            rf_complexity(trial.params)
-        )
-    )
-
-    best_trial = completed_trials[0]
-
-    best_params = best_trial.params
-
-    # Retrain on complete training partition.
-    model = RandomForestClassifier(
-        **best_params
-    )
-
-    model.fit(
-        X_train,
-        y_train
+        time.perf_counter()
+        - start_time
     )
 
     return (
-        model,
-        best_params,
-        float(best_trial.value),
-        rf_complexity(best_params),
+        study,
         optimization_time,
     )
 
 
+# ============================================================
+# XGBOOST OPTUNA
+# ============================================================
+
 def optimize_xgboost(
     X_train,
-    y_train
+    y_train,
 ):
-    """
-    E6: XGBoost optimized using Optuna TPE.
-
-    Thesis-defined Optuna search space:
-        n_estimators: 100-300
-        learning_rate: 0.01-0.20
-        max_depth: 3-7
-        subsample: 0.8-1.0
-        colsample_bytree: 0.8-1.0
-    """
-
     def objective(trial):
         params = {
             "n_estimators": trial.suggest_int(
                 "n_estimators",
-                100,
-                300
+                XGB_OPTUNA["n_estimators"][0],
+                XGB_OPTUNA["n_estimators"][1],
             ),
-
             "learning_rate": trial.suggest_float(
                 "learning_rate",
-                0.01,
-                0.20
+                XGB_OPTUNA["learning_rate"][0],
+                XGB_OPTUNA["learning_rate"][1],
             ),
-
             "max_depth": trial.suggest_int(
                 "max_depth",
-                3,
-                7
+                XGB_OPTUNA["max_depth"][0],
+                XGB_OPTUNA["max_depth"][1],
             ),
-
             "subsample": trial.suggest_float(
                 "subsample",
-                0.8,
-                1.0
+                XGB_OPTUNA["subsample"][0],
+                XGB_OPTUNA["subsample"][1],
             ),
-
             "colsample_bytree": trial.suggest_float(
                 "colsample_bytree",
-                0.8,
-                1.0
+                XGB_OPTUNA["colsample_bytree"][0],
+                XGB_OPTUNA["colsample_bytree"][1],
             ),
         }
 
         model = XGBClassifier(
-            **params
+            random_state=RANDOM_STATE,
+            eval_metric="logloss",
+            **params,
         )
 
         scores = cross_val_score(
@@ -258,7 +169,7 @@ def optimize_xgboost(
             n_jobs=-1,
         )
 
-        return float(scores.mean())
+        return scores.mean()
 
     sampler = optuna.samplers.TPESampler(
         seed=RANDOM_STATE
@@ -269,193 +180,157 @@ def optimize_xgboost(
         sampler=sampler,
     )
 
-    start = time.perf_counter()
+    start_time = time.perf_counter()
 
     study.optimize(
         objective,
-        n_trials=N_TRIALS,
-        show_progress_bar=False,
+        n_trials=N_OPTUNA_TRIALS,
     )
 
     optimization_time = (
-        time.perf_counter() - start
-    )
-
-    completed_trials = [
-        trial
-        for trial in study.trials
-        if trial.state == optuna.trial.TrialState.COMPLETE
-    ]
-
-    if not completed_trials:
-        raise RuntimeError(
-            "Optuna completed no valid trials."
-        )
-
-    completed_trials.sort(
-        key=lambda trial: (
-            -trial.value,
-            xgb_complexity(trial.params)
-        )
-    )
-
-    best_trial = completed_trials[0]
-
-    best_params = best_trial.params
-
-    # Retrain on complete training partition.
-    model = XGBClassifier(
-        **best_params
-    )
-
-    model.fit(
-        X_train,
-        y_train
+        time.perf_counter()
+        - start_time
     )
 
     return (
-        model,
-        best_params,
-        float(best_trial.value),
-        xgb_complexity(best_params),
+        study,
         optimization_time,
     )
 
 
-def run_dataset(dataset_name):
-    config = DATASETS[dataset_name]
+# ============================================================
+# RANDOM FOREST TRAINING
+# ============================================================
 
-    (
-        X_train,
-        X_test,
-        y_train,
-        y_test,
-        metadata,
-    ) = preprocess_and_split(
-        path=config["path"],
-        dataset_name=dataset_name,
-        target_column=config["target"],
+def train_random_forest(dataset_name):
+    split = get_dataset_split(dataset_name)
+
+    X_train = split["X_train"]
+    y_train = split["y_train"]
+
+    study, optimization_time = (
+        optimize_random_forest(
+            X_train,
+            y_train,
+        )
+    )
+
+    best_params = study.best_params
+    best_score = study.best_value
+
+    model = RandomForestClassifier(
         random_state=RANDOM_STATE,
+        **best_params,
     )
 
-    # ------------------------------------------------------------
-    # E3 - Random Forest Optuna
-    # ------------------------------------------------------------
-    (
-        rf_model,
-        rf_params,
-        rf_score,
-        rf_complexity_value,
-        rf_search_time,
-    ) = optimize_random_forest(
+    model.fit(
         X_train,
-        y_train
+        y_train,
     )
 
-    rf_path = (
-        MODEL_DIR /
-        f"{dataset_name}_E3_RF_Optuna.joblib"
+    model_path = (
+        MODEL_DIR
+        / f"{dataset_name}_E3_random_forest.joblib"
     )
 
-    joblib.dump(
-        rf_model,
-        rf_path
+    save_model(
+        model,
+        model_path,
     )
 
-    # ------------------------------------------------------------
-    # E6 - XGBoost Optuna
-    # ------------------------------------------------------------
-    (
-        xgb_model,
-        xgb_params,
-        xgb_score,
-        xgb_complexity_value,
-        xgb_search_time,
-    ) = optimize_xgboost(
-        X_train,
-        y_train
-    )
-
-    xgb_path = (
-        MODEL_DIR /
-        f"{dataset_name}_E6_XGB_Optuna.joblib"
-    )
-
-    joblib.dump(
-        xgb_model,
-        xgb_path
-    )
-
-    results = {
+    metadata = {
         "dataset": dataset_name,
-
-        "E3": {
-            "model": str(rf_path),
-            "trials": N_TRIALS,
-            "best_parameters": rf_params,
-            "mean_cv_accuracy": rf_score,
-            "complexity_proxy": rf_complexity_value,
-            "optimization_wall_clock_seconds": rf_search_time,
-        },
-
-        "E6": {
-            "model": str(xgb_path),
-            "trials": N_TRIALS,
-            "best_parameters": xgb_params,
-            "mean_cv_accuracy": xgb_score,
-            "complexity_proxy": xgb_complexity_value,
-            "optimization_wall_clock_seconds": xgb_search_time,
-        },
-
-        "preprocessing": metadata,
+        "experiment": "E3",
+        "classifier": "Random Forest",
+        "optimizer": "Optuna",
+        "sampler": "TPE",
+        "trials": N_OPTUNA_TRIALS,
+        "cv_folds": CV_FOLDS,
+        "best_cv_accuracy": float(best_score),
+        "best_parameters": best_params,
+        "optimization_time_seconds": optimization_time,
     }
 
-    result_path = (
-        MODEL_DIR /
-        f"{dataset_name}_optuna_metadata.json"
+    save_json(
+        metadata,
+        RESULT_DIR
+        / f"{dataset_name}_E3_training.json",
     )
 
-    with open(result_path, "w", encoding="utf-8") as file:
-        json.dump(
-            results,
-            file,
-            indent=4
+
+# ============================================================
+# XGBOOST TRAINING
+# ============================================================
+
+def train_xgboost(dataset_name):
+    split = get_dataset_split(dataset_name)
+
+    X_train = split["X_train"]
+    y_train = split["y_train"]
+
+    study, optimization_time = (
+        optimize_xgboost(
+            X_train,
+            y_train,
         )
-
-    print("\nE3 Random Forest")
-    print("Best parameters:", rf_params)
-    print("CV accuracy:", rf_score)
-    print(
-        "Optimization time:",
-        rf_search_time,
-        "seconds"
     )
 
-    print("\nE6 XGBoost")
-    print("Best parameters:", xgb_params)
-    print("CV accuracy:", xgb_score)
-    print(
-        "Optimization time:",
-        xgb_search_time,
-        "seconds"
+    best_params = study.best_params
+    best_score = study.best_value
+
+    model = XGBClassifier(
+        random_state=RANDOM_STATE,
+        eval_metric="logloss",
+        **best_params,
     )
 
-    return results
-
-
-def main():
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "--dataset",
-        choices=list(DATASETS.keys()),
-        required=True
+    model.fit(
+        X_train,
+        y_train,
     )
 
-    args = parser.parse_args()
+    model_path = (
+        MODEL_DIR
+        / f"{dataset_name}_E6_xgboost.joblib"
+    )
 
-    run_dataset(args.dataset)
+    save_model(
+        model,
+        model_path,
+    )
 
+    metadata = {
+        "dataset": dataset_name,
+        "experiment": "E6",
+        "classifier": "XGBoost",
+        "optimizer": "Optuna",
+        "sampler": "TPE",
+        "trials": N_OPTUNA_TRIALS,
+        "cv_folds": CV_FOLDS,
+        "best_cv_accuracy": float(best_score),
+        "best_parameters": best_params,
+        "optimization_time_seconds": optimization_time,
+    }
+
+    save_json(
+        metadata,
+        RESULT_DIR
+        / f"{dataset_name}_E6_training.json",
+    )
+
+
+# ============================================================
+# MAIN
+# ============================================================
 
 if __name__ == "__main__":
-    main()
+    ensure_directories()
+
+    for dataset_name in DATASETS:
+        print(f"\nTraining E3: {dataset_name}")
+        train_random_forest(dataset_name)
+
+        print(f"Training E6: {dataset_name}")
+        train_xgboost(dataset_name)
+
+    print("\nOptuna training complete.")
