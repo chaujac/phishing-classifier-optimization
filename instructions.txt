@@ -10,7 +10,7 @@ project folder.
 
 Example:
 
-cd C:\path\to\phishing-classifier
+cd C:\path\to\phishing-classifier-optimization
 
 Create the virtual environment if it does not exist:
 
