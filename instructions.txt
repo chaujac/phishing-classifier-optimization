@@ -1,8 +1,3 @@
-Yes. Since your actual structure has all scripts inside `src/`, the instructions should use `python src/...` and explicitly explain where **data, models, and results** are saved.
-
-Here is the updated `instructions.txt` content:
-
-```text
 PHISHING CLASSIFIER OPTIMIZATION
 RUN INSTRUCTIONS
 ============================================================
@@ -762,6 +757,3 @@ python src/05_evaluate.py
 ============================================================
 END OF INSTRUCTIONS
 ============================================================
-```
-
-**One important point:** don't run the complete sequence immediately after dropping in the dataset. Run `01_preprocess.py` first and check that `data/processed/` and `results/preprocessing/` contain what we expect. Then proceed to the baseline, GridSearchCV, and Optuna stages. This prevents a dataset/path mismatch from wasting a potentially long optimization run.
