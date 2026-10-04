@@ -29,8 +29,9 @@ phishing-classifier-optimization/
 |-- data/
 |   |-- raw/
 |   |   |-- phishing.csv
-|   |
+|   |   |--
 |   |-- processed/
+|       |--
 |
 |-- models/
 |   |-- baseline/
@@ -46,13 +47,14 @@ phishing-classifier-optimization/
 |
 |-- src/
 |   |-- common.py
-|   |-- 01_preprocess.py
-|   |-- 02_baseline.py
-|   |-- 03_gridsearch.py
-|   |-- 04_optuna.py
-|   |-- 05_evaluate.py
-|
+|   |-- data_preprocessing.py
+|   |-- evaluate.py
+|   |-- train_baseline.py
+|   |-- train_gridsearch.py
+|   |-- train_optuna.py
+|   
 |-- requirements.txt
+|-- instructions.txt
 |-- .gitignore
 |-- README.md
 
