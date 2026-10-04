@@ -1,0 +1,390 @@
+PHISHING CLASSIFIER EXPERIMENTAL PIPELINE
+RUN INSTRUCTIONS
+============================================================
+
+1. PROJECT SETUP
+============================================================
+
+Open PowerShell or the VS Code terminal and navigate to the
+project folder.
+
+Example:
+
+cd C:\path\to\phishing-classifier
+
+Create the virtual environment if it does not exist:
+
+python -m venv .venv
+
+Activate it:
+
+.\.venv\Scripts\Activate.ps1
+
+If PowerShell blocks activation, run:
+
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+Then activate again:
+
+.\.venv\Scripts\Activate.ps1
+
+
+============================================================
+2. INSTALL DEPENDENCIES
+============================================================
+
+Install all dependencies from requirements.txt:
+
+python -m pip install -r requirements.txt
+
+If requirements.txt does not exist yet, install the required
+packages manually:
+
+python -m pip install numpy pandas scikit-learn xgboost optuna joblib scipy matplotlib seaborn openpyxl
+
+Then create requirements.txt:
+
+python -m pip freeze > requirements.txt
+
+
+============================================================
+3. VERIFY THE ENVIRONMENT
+============================================================
+
+Run:
+
+python -c "import numpy, pandas, sklearn, xgboost, optuna, joblib; print('Environment OK')"
+
+Expected output:
+
+Environment OK
+
+If VS Code still reports missing imports:
+
+1. Press Ctrl + Shift + P
+2. Select "Python: Select Interpreter"
+3. Select:
+
+   .venv\Scripts\python.exe
+
+4. Press Ctrl + Shift + P
+5. Select "Developer: Reload Window"
+
+
+============================================================
+4. PROJECT STRUCTURE
+============================================================
+
+Recommended structure:
+
+phishing-classifier/
+|
+|-- .venv/                    # Local Python environment
+|-- data/                     # Dataset
+|-- models/                   # Saved models
+|-- results/                  # Experiment results
+|
+|-- common.py                 # Shared configuration/utilities
+|-- 01_preprocess.py
+|-- 02_baseline.py
+|-- 03_gridsearch.py
+|-- 04_optuna.py
+|-- 05_evaluate.py
+|
+|-- requirements.txt
+|-- .gitignore
+|-- README.md
+
+IMPORTANT:
+
+Do NOT run common.py directly.
+
+The experimental scripts import common.py.
+
+
+============================================================
+5. ADD THE DATASET
+============================================================
+
+Place the dataset inside:
+
+data/
+
+Example:
+
+data/phishing.csv
+
+The exact filename and target-column name must match the
+configuration defined in common.py.
+
+Before running the experiments, verify:
+
+[ ] Dataset filename
+[ ] Dataset location
+[ ] Dataset format
+[ ] Feature columns
+[ ] Target column
+[ ] Missing values
+[ ] Preprocessing requirements
+
+
+============================================================
+6. RUN THE PIPELINE
+============================================================
+
+Run the scripts in this order.
+
+
+STEP 1: PREPROCESSING
+------------------------------------------------------------
+
+python 01_preprocess.py
+
+This prepares the dataset for the experiments.
+
+
+STEP 2: BASELINE MODELS
+------------------------------------------------------------
+
+python 02_baseline.py
+
+This trains the baseline classifiers.
+
+The baseline provides the comparison point for determining
+the effect of hyperparameter optimization.
+
+
+STEP 3: GRIDSEARCHCV
+------------------------------------------------------------
+
+python 03_gridsearch.py
+
+This performs GridSearchCV using the hyperparameter search
+spaces defined in common.py.
+
+This may take a significant amount of time depending on:
+
+- Dataset size
+- Number of models
+- Number of hyperparameter combinations
+- Number of cross-validation folds
+- Computer performance
+
+
+STEP 4: OPTUNA
+------------------------------------------------------------
+
+python 04_optuna.py
+
+This performs Optuna hyperparameter optimization.
+
+This may also take a significant amount of time.
+
+
+STEP 5: FINAL EVALUATION
+------------------------------------------------------------
+
+python 05_evaluate.py
+
+This compares the experimental results and generates the
+metrics needed for the thesis analysis.
+
+The evaluation should include the performance and latency
+metrics specified in the thesis methodology.
+
+
+============================================================
+7. COMPLETE COMMAND SEQUENCE
+============================================================
+
+Once the environment and dataset are configured:
+
+.\.venv\Scripts\Activate.ps1
+
+python -m pip install -r requirements.txt
+
+python -c "import numpy, pandas, sklearn, xgboost, optuna, joblib; print('Environment OK')"
+
+python 01_preprocess.py
+
+python 02_baseline.py
+
+python 03_gridsearch.py
+
+python 04_optuna.py
+
+python 05_evaluate.py
+
+
+============================================================
+8. DO NOT RUN EVERYTHING BLINDLY
+============================================================
+
+Before running GridSearchCV or Optuna, make sure:
+
+[ ] Dataset is in the correct location
+[ ] Dataset filename matches common.py
+[ ] Target column is correct
+[ ] Preprocessing completes successfully
+[ ] Baseline training completes successfully
+[ ] Output directories exist
+[ ] Models can be saved
+[ ] Models can be loaded
+[ ] All imports work
+[ ] Search spaces match the thesis methodology
+
+If an earlier script fails, fix it before continuing.
+
+GridSearchCV and Optuna can take significantly longer than
+preprocessing and baseline training.
+
+
+============================================================
+9. IMPORT ERRORS
+============================================================
+
+If you see errors such as:
+
+Import "numpy" could not be resolved
+Import "pandas" could not be resolved
+Import "xgboost" could not be resolved
+Import "optuna" could not be resolved
+Import "joblib" could not be resolved
+
+Activate the environment:
+
+.\.venv\Scripts\Activate.ps1
+
+Then reinstall:
+
+python -m pip install -r requirements.txt
+
+Verify:
+
+python -c "import numpy, pandas, sklearn, xgboost, optuna, joblib; print('Environment OK')"
+
+Also make sure VS Code is using:
+
+.venv\Scripts\python.exe
+
+
+============================================================
+10. DATASET PATH ERRORS
+============================================================
+
+If a script cannot find the dataset, check common.py.
+
+For example, if common.py expects:
+
+data/phishing.csv
+
+the actual file should be:
+
+phishing-classifier\data\phishing.csv
+
+Check spelling and capitalization of the filename.
+
+
+============================================================
+11. GIT COMMANDS
+============================================================
+
+Do NOT commit the .venv directory.
+
+Your .gitignore should contain:
+
+.venv/
+
+
+Check the repository:
+
+git status
+
+
+Add project changes:
+
+git add .
+
+
+Commit:
+
+git commit -m "Update phishing classifier experimental pipeline"
+
+
+Push:
+
+git push
+
+
+============================================================
+12. RECOMMENDED EXPERIMENT WORKFLOW
+============================================================
+
+1. Activate .venv
+2. Verify dependencies
+3. Confirm dataset
+4. Confirm common.py configuration
+5. Run preprocessing
+6. Check preprocessing output
+7. Run baseline models
+8. Check baseline results
+9. Run GridSearchCV
+10. Check GridSearchCV results
+11. Run Optuna
+12. Check Optuna results
+13. Run final evaluation
+14. Inspect generated results
+15. Commit appropriate code/results
+
+
+============================================================
+13. THESIS REPRODUCIBILITY
+============================================================
+
+Keep shared configuration inside common.py.
+
+This should centralize:
+
+- Dataset paths
+- Output paths
+- Random seeds
+- Model configurations
+- Hyperparameter search spaces
+- Experiment settings
+- Utility functions
+
+Avoid manually changing individual scripts when a setting
+should be shared across experiments.
+
+If an experimental configuration changes, document the change
+and rerun the affected experiments.
+
+
+============================================================
+14. QUICK START
+============================================================
+
+For a properly configured project:
+
+cd C:\path\to\phishing-classifier
+
+.\.venv\Scripts\Activate.ps1
+
+python -m pip install -r requirements.txt
+
+python -c "import numpy, pandas, sklearn, xgboost, optuna, joblib; print('Environment OK')"
+
+python 01_preprocess.py
+
+python 02_baseline.py
+
+python 03_gridsearch.py
+
+python 04_optuna.py
+
+python 05_evaluate.py
+
+
+============================================================
+END OF RUN INSTRUCTIONS
+============================================================
