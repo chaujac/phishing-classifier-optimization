@@ -11,18 +11,18 @@ on the accuracy-latency trade-off of phishing classifiers.
 
 The experimental pipeline consists of:
 
-1. Data preprocessing
-2. Baseline model training
-3. GridSearchCV optimization
-4. Optuna optimization
-5. Final evaluation and comparison
+1. Data preprocessing and canonical splitting
+2. Baseline model training (E1, E4)
+3. GridSearchCV optimization (E2, E5)
+4. Optuna optimization (E3, E6)
+5. Final model evaluation and comparison
 
 
 ============================================================
 1. PROJECT STRUCTURE
 ============================================================
 
-The project should follow this structure:
+The project follows this folder and file structure:
 
 phishing-classifier-optimization/
 |
@@ -34,20 +34,26 @@ phishing-classifier-optimization/
 |   |   |-- zenodo-not-phishing.csv
 |   |   |-- zenodo-phishing.csv
 |   |-- processed/
-|   |-- testing/
-|       |-- testDataset.py 
+|   |   |-- uci_split.joblib
+|   |   |-- web_page_split.joblib
+|   |   |-- phiusil_split.joblib
+|   |   |-- zenodo_split.joblib
 |
 |-- models/
-|   |-- baseline/
-|   |-- gridsearch/
-|   |-- optuna/
+|   |-- uci_E1_random_forest.joblib
+|   |-- uci_E3_random_forest.joblib
+|   |-- uci_E4_xgboost.joblib
+|   |-- uci_E6_xgboost.joblib
+|   |-- ... (and other dataset models)
 |
 |-- results/
-|   |-- preprocessing/
-|   |-- baseline/
-|   |-- gridsearch/
-|   |-- optuna/
+|   |-- training/
+|   |   |-- uci_E1_training.json
+|   |   |-- uci_E3_training.json
+|   |   |-- ... (training metadata and best parameters)
 |   |-- evaluation/
+|       |-- uci_E1_evaluation.json
+|       |-- ... (final evaluation performance reports)
 |
 |-- src/
 |   |-- common.py
@@ -59,112 +65,51 @@ phishing-classifier-optimization/
 |   
 |-- requirements.txt
 |-- instructions.txt
-|-- .gitignore
-|-- .gitattributes
 |-- README.md
 
 
-IMPORTANT:
-
-All Python scripts are located inside the src/ directory.
-
-common.py contains shared configuration, paths, hyperparameter
-search spaces, and utility functions.
-
-Do NOT run common.py directly.
-
-
 ============================================================
-2. OPEN THE PROJECT
+2. ENVIRONMENT SETUP
 ============================================================
 
-Open the project folder in VS Code.
-
-The terminal should be opened at the project root:
-
-phishing-classifier-optimization/
-
-Verify the current location:
-
-pwd
-
-or in PowerShell:
-
-Get-Location
-
-
-============================================================
-3. CREATE THE VIRTUAL ENVIRONMENT
-============================================================
-
-If .venv does not exist:
+Open the project folder in VS Code, open the terminal at the project root, and run:
 
 python -m venv .venv
-
-Activate the environment:
-
 .\.venv\Scripts\Activate.ps1
-
-After activation, the terminal should show:
-
-(.venv)
-
-at the beginning of the command line.
-
-
-============================================================
-4. INSTALL DEPENDENCIES
-============================================================
-
 python -m pip install -r requirements.txt
 
 
 ============================================================
-5. VERIFY THE ENVIRONMENT
+3. RUN THE PIPELINE IN ORDER
 ============================================================
 
-Run:
-
-python -c "import numpy, pandas, sklearn, xgboost, optuna, joblib; print('Environment OK')"
-
-
-============================================================
-6. RUN THE PIPELINE IN ORDER
-============================================================
-
-From the project root with .venv activated:
-
-1. Preprocessing:
+1. Preprocessing (Generates 80/20 train/test joblib splits):
 python src/data_preprocessing.py
 
-2. Baseline Training:
+2. Baseline Model Training (E1, E4):
 python src/train_baseline.py
 
-3. GridSearchCV Optimization:
+3. GridSearchCV Optimization (E2, E5):
 python src/train_gridsearch.py
 
-4. Optuna Optimization:
+4. Optuna Optimization (E3, E6):
 python src/train_optuna.py
 
-5. Final Evaluation:
+5. Model Evaluation (Run per dataset and experiment model):
 python src/evaluate.py --dataset <dataset_name> --experiment <E1-E6> --model <model_filename>
 
+Example:
+python src/evaluate.py --dataset uci --experiment E1 --model uci_E1_random_forest.joblib
+
 
 ============================================================
-7. COMPLETE COMMAND SEQUENCE
+4. FILE NAMING CONVENTIONS
 ============================================================
 
-.\.venv\Scripts\Activate.ps1
-
-python -m pip install -r requirements.txt
-
-python src/data_preprocessing.py
-
-python src/train_baseline.py
-
-python src/train_gridsearch.py
-
-python src/train_optuna.py
+- Processed Splits: data/processed/{dataset}_split.joblib
+- Trained Models: models/{dataset}_{experiment}_{classifier_name}.joblib
+- Training Logs: results/training/{dataset}_{experiment}_training.json
+- Evaluation Reports: results/evaluation/{dataset}_{experiment}_evaluation.json
 
 
 ============================================================
