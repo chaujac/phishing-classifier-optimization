@@ -1,15 +1,14 @@
 import sys
 import subprocess
-from common import DATASETS, EXPERIMENTS
+from common import DATASETS, EXPERIMENTS, MODEL_DIR
 
 def run_batch_evaluation():
-    print("Starting automated batch evaluation for all trained models...")
+    print("Starting automated batch evaluation for available trained models...")
     
     for dataset_name in DATASETS.keys():
         for exp_key, exp_info in EXPERIMENTS.items():
             classifier_name = exp_info["classifier"]
             
-            # Match your exact .joblib filename convention (e.g., random_forest or xgboost)
             if classifier_name == "RandomForest":
                 classifier_slug = "random_forest"
             elif classifier_name == "XGBoost":
@@ -18,10 +17,15 @@ def run_batch_evaluation():
                 classifier_slug = classifier_name.lower().replace(" ", "_")
             
             model_filename = f"{dataset_name}_{exp_key}_{classifier_slug}.joblib"
+            model_path = MODEL_DIR / model_filename
+            
+            # Check if the model file actually exists before running evaluation
+            if not model_path.exists():
+                print(f"Skipping -> Dataset: {dataset_name} | Experiment: {exp_key} (Model not found: {model_filename})")
+                continue
             
             print(f"\nEvaluating -> Dataset: {dataset_name} | Experiment: {exp_key} | Model: {model_filename}")
             
-            # Use sys.executable to guarantee the active virtual environment is used
             cmd = [
                 sys.executable, 
                 "src/evaluate.py", 
