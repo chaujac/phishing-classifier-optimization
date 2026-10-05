@@ -28,10 +28,15 @@ phishing-classifier-optimization/
 |
 |-- data/
 |   |-- raw/
-|   |   |-- phishing.csv
-|   |   |--
+|   |   |-- mendeley-web-page-phishing-detection.dataset.csv
+|   |   |-- phiusiil-phishing-url-dataset.csv
+|   |   |-- uci-ml-phishing-dataset.csv
+|   |   |-- zenodo-not-phishing.csv
+|   |   |-- zenodo-phishing.csv
 |   |-- processed/
-|       |--
+|   |   |--
+|   |-- testing/
+|       |--testDataset.py 
 |
 |-- models/
 |   |-- baseline/
@@ -56,6 +61,7 @@ phishing-classifier-optimization/
 |-- requirements.txt
 |-- instructions.txt
 |-- .gitignore
+|-- .gitattributes
 |-- README.md
 
 
