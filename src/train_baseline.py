@@ -3,14 +3,12 @@ import json
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 
-from common import (
-    DATASETS,
-    MODEL_DIR,
-    RESULT_DIR,
-    RANDOM_STATE,
-    ensure_directories,
-    save_model,
-    save_json,
+from common import DATASETS, MODEL_DIR, TRAINING_RESULT_DIR, RANDOM_STATE, ensure_directories, save_model, save_json
+
+# When saving training results:
+save_json(
+    metadata,
+    TRAINING_RESULT_DIR / f"{dataset_name}_E1_training.json", # (or E4/E2/E5 accordingly)
 )
 
 from data_preprocessing import get_dataset_split

@@ -24,6 +24,10 @@ from common import (
     save_json,
 )
 
+save_json(
+    metadata,
+    TRAINING_RESULT_DIR / f"{dataset_name}_E3_training.json", # (or E6)
+)
 from data_preprocessing import get_dataset_split
 
 

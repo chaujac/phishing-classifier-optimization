@@ -214,7 +214,7 @@ def evaluate_model(
     }
 
     output_path = (
-        RESULT_DIR
+        EVALUATION_RESULT_DIR
         / f"{dataset_name}_{experiment}_evaluation.json"
     )
 

@@ -10,9 +10,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 DATA_DIR = BASE_DIR / "data"
 RAW_DIR = DATA_DIR / "raw"
-SPLIT_DIR = DATA_DIR / "processed"  # Outputs splits to data/processed/ instead of splits/
+SPLIT_DIR = DATA_DIR / "processed"
 MODEL_DIR = BASE_DIR / "models"
 RESULT_DIR = BASE_DIR / "results"
+
+# Add these explicit sub-directory paths
+TRAINING_RESULT_DIR = RESULT_DIR / "training"
+EVALUATION_RESULT_DIR = RESULT_DIR / "evaluation"
+PREPROCESSING_RESULT_DIR = RESULT_DIR / "preprocessing"
 
 
 # ============================================================
@@ -142,6 +147,9 @@ def ensure_directories():
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
     RESULT_DIR.mkdir(parents=True, exist_ok=True)
     SPLIT_DIR.mkdir(parents=True, exist_ok=True)
+    TRAINING_RESULT_DIR.mkdir(parents=True, exist_ok=True)
+    EVALUATION_RESULT_DIR.mkdir(parents=True, exist_ok=True)
+    PREPROCESSING_RESULT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def save_model(model, path):
