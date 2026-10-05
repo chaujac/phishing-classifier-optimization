@@ -34,9 +34,8 @@ phishing-classifier-optimization/
 |   |   |-- zenodo-not-phishing.csv
 |   |   |-- zenodo-phishing.csv
 |   |-- processed/
-|   |   |--
 |   |-- testing/
-|       |--testDataset.py 
+|       |-- testDataset.py 
 |
 |-- models/
 |   |-- baseline/
@@ -93,8 +92,6 @@ or in PowerShell:
 
 Get-Location
 
-The terminal should point to the project directory.
-
 
 ============================================================
 3. CREATE THE VIRTUAL ENVIRONMENT
@@ -116,650 +113,58 @@ at the beginning of the command line.
 
 
 ============================================================
-4. IF POWERSHELL BLOCKS ACTIVATION
+4. INSTALL DEPENDENCIES
 ============================================================
-
-If you receive an execution-policy error, run:
-
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-
-Then activate again:
-
-.\.venv\Scripts\Activate.ps1
-
-
-============================================================
-5. INSTALL DEPENDENCIES
-============================================================
-
-If requirements.txt already exists:
 
 python -m pip install -r requirements.txt
 
-If requirements.txt does not exist yet:
-
-python -m pip install numpy pandas scikit-learn xgboost optuna joblib scipy matplotlib seaborn openpyxl
-
-Then create requirements.txt:
-
-python -m pip freeze > requirements.txt
-
 
 ============================================================
-6. VERIFY THE ENVIRONMENT
+5. VERIFY THE ENVIRONMENT
 ============================================================
 
 Run:
 
 python -c "import numpy, pandas, sklearn, xgboost, optuna, joblib; print('Environment OK')"
 
-Expected output:
 
-Environment OK
+============================================================
+6. RUN THE PIPELINE IN ORDER
+============================================================
 
-If this works, the required machine learning packages are
-available in the active Python environment.
+From the project root with .venv activated:
+
+1. Preprocessing:
+python src/data_preprocessing.py
+
+2. Baseline Training:
+python src/train_baseline.py
+
+3. GridSearchCV Optimization:
+python src/train_gridsearch.py
+
+4. Optuna Optimization:
+python src/train_optuna.py
+
+5. Final Evaluation:
+python src/evaluate.py --dataset <dataset_name> --experiment <E1-E6> --model <model_filename>
 
 
 ============================================================
-7. CONFIGURE VS CODE PYTHON
+7. COMPLETE COMMAND SEQUENCE
 ============================================================
-
-If Pylance reports errors such as:
-
-Import "numpy" could not be resolved
-Import "pandas" could not be resolved
-Import "xgboost" could not be resolved
-Import "optuna" could not be resolved
-Import "joblib" could not be resolved
-
-Select the correct Python interpreter.
-
-In VS Code:
-
-1. Press Ctrl + Shift + P
-2. Select "Python: Select Interpreter"
-3. Select:
-
-   .venv\Scripts\python.exe
-
-4. Press Ctrl + Shift + P
-5. Select "Developer: Reload Window"
-
-
-============================================================
-8. ADD THE DATASET
-============================================================
-
-Place the original dataset inside:
-
-data/raw/
-
-Example:
-
-data/raw/phishing.csv
-
-The exact filename must match the configuration in:
-
-src/common.py
-
-Do not manually place processed datasets into data/processed/
-unless the pipeline specifically requires it.
-
-The preprocessing script is responsible for generating the
-processed data.
-
-
-============================================================
-9. CHECK common.py BEFORE RUNNING
-============================================================
-
-common.py is the central configuration file for the project.
-
-It should contain shared settings such as:
-
-- Project paths
-- Raw data path
-- Processed data path
-- Results paths
-- Model paths
-- Random seed
-- Target column
-- Feature configuration
-- Model configuration
-- Hyperparameter search spaces
-- GridSearchCV settings
-- Optuna settings
-- Utility functions
-
-Individual scripts should import these settings from common.py
-instead of defining duplicate paths and configurations.
-
-
-============================================================
-10. RUN THE PIPELINE
-============================================================
-
-IMPORTANT:
-
-Run the scripts from the PROJECT ROOT.
-
-Do NOT change into the src/ directory before running them.
-
-Correct:
-
-python src/01_preprocess.py
-
-Incorrect:
-
-cd src
-python 01_preprocess.py
-
-
-============================================================
-11. STEP 1 - PREPROCESSING
-============================================================
-
-Run:
-
-python src/01_preprocess.py
-
-Purpose:
-
-- Load the raw dataset
-- Perform the required preprocessing
-- Prepare the features and target
-- Perform the required train/test preparation
-- Save processed data
-- Save preprocessing-related results
-
-Expected output locations:
-
-data/processed/
-
-and:
-
-results/preprocessing/
-
-The exact filenames are controlled by common.py.
-
-
-============================================================
-12. STEP 2 - BASELINE MODELS
-============================================================
-
-Run:
-
-python src/02_baseline.py
-
-Purpose:
-
-- Load the processed dataset
-- Train the baseline classifiers
-- Measure baseline performance
-- Measure baseline inference latency
-- Save trained baseline models
-- Save baseline results
-
-Expected model location:
-
-models/baseline/
-
-Expected result location:
-
-results/baseline/
-
-The baseline establishes the comparison point for evaluating
-the effect of hyperparameter optimization.
-
-
-============================================================
-13. STEP 3 - GRIDSEARCHCV
-============================================================
-
-Run:
-
-python src/03_gridsearch.py
-
-Purpose:
-
-- Load the processed dataset
-- Use the predefined models
-- Apply the hyperparameter search spaces
-- Run GridSearchCV
-- Identify the best hyperparameters
-- Train/save the best optimized models
-- Measure the required performance metrics
-- Measure latency
-- Save GridSearchCV results
-
-Expected model location:
-
-models/gridsearch/
-
-Expected result location:
-
-results/gridsearch/
-
-IMPORTANT:
-
-GridSearchCV may take a significant amount of time.
-
-Do not stop the process unless necessary.
-
-
-============================================================
-14. STEP 4 - OPTUNA
-============================================================
-
-Run:
-
-python src/04_optuna.py
-
-Purpose:
-
-- Load the processed dataset
-- Run Optuna optimization
-- Search for optimized hyperparameters
-- Identify the best trial
-- Train/save the optimized model
-- Measure performance
-- Measure latency
-- Save Optuna results
-
-Expected model location:
-
-models/optuna/
-
-Expected result location:
-
-results/optuna/
-
-IMPORTANT:
-
-Optuna may take a significant amount of time depending on the
-number of trials and models.
-
-
-============================================================
-15. STEP 5 - FINAL EVALUATION
-============================================================
-
-Run:
-
-python src/05_evaluate.py
-
-Purpose:
-
-- Load the baseline results
-- Load the GridSearchCV results
-- Load the Optuna results
-- Compare classifier performance
-- Compare latency
-- Generate the final accuracy-latency comparison
-- Save final evaluation results
-
-Expected result location:
-
-results/evaluation/
-
-This directory should contain the final results used for
-analysis in the thesis.
-
-
-============================================================
-16. COMPLETE RUN ORDER
-============================================================
-
-After the dataset and environment are ready:
-
-1.
-
-python src/01_preprocess.py
-
-
-2.
-
-python src/02_baseline.py
-
-
-3.
-
-python src/03_gridsearch.py
-
-
-4.
-
-python src/04_optuna.py
-
-
-5.
-
-python src/05_evaluate.py
-
-
-Do not skip steps unless the experiment methodology explicitly
-allows it.
-
-
-============================================================
-17. COMPLETE COMMAND SEQUENCE
-============================================================
-
-From the project root:
 
 .\.venv\Scripts\Activate.ps1
 
 python -m pip install -r requirements.txt
 
-python -c "import numpy, pandas, sklearn, xgboost, optuna, joblib; print('Environment OK')"
+python src/data_preprocessing.py
 
-python src/01_preprocess.py
+python src/train_baseline.py
 
-python src/02_baseline.py
+python src/train_gridsearch.py
 
-python src/03_gridsearch.py
-
-python src/04_optuna.py
-
-python src/05_evaluate.py
-
-
-============================================================
-18. WHERE RESULTS GO
-============================================================
-
-The Python command itself is NOT the result.
-
-For example:
-
-python src/01_preprocess.py
-
-runs the preprocessing program.
-
-The program should save its outputs automatically.
-
-The expected organization is:
-
-data/processed/
-    Processed datasets
-
-models/baseline/
-    Baseline trained models
-
-models/gridsearch/
-    GridSearchCV optimized models
-
-models/optuna/
-    Optuna optimized models
-
-results/preprocessing/
-    Preprocessing-related outputs
-
-results/baseline/
-    Baseline metrics
-
-results/gridsearch/
-    GridSearchCV metrics and search results
-
-results/optuna/
-    Optuna metrics and optimization results
-
-results/evaluation/
-    Final comparison and evaluation
-
-
-Do NOT manually move generated results between folders.
-
-
-============================================================
-19. BEFORE RUNNING THE EXPERIMENTS
-============================================================
-
-Verify all of the following:
-
-[ ] Dataset is inside data/raw/
-[ ] Dataset filename matches common.py
-[ ] Target column matches common.py
-[ ] .venv is activated
-[ ] requirements.txt is installed
-[ ] All imports work
-[ ] VS Code uses .venv
-[ ] common.py contains the correct paths
-[ ] Random seed is configured
-[ ] Model configurations are correct
-[ ] Hyperparameter search spaces are correct
-[ ] Output directories are configured
-
-
-============================================================
-20. TEST THE PIPELINE IN ORDER
-============================================================
-
-Do not immediately start GridSearchCV and Optuna.
-
-First run:
-
-python src/01_preprocess.py
-
-Check:
-
-data/processed/
-results/preprocessing/
-
-If successful, run:
-
-python src/02_baseline.py
-
-Check:
-
-models/baseline/
-results/baseline/
-
-Only after the baseline works should you run:
-
-python src/03_gridsearch.py
-
-Then:
-
-python src/04_optuna.py
-
-Finally:
-
-python src/05_evaluate.py
-
-
-============================================================
-21. TROUBLESHOOTING
-============================================================
-
-IMPORT ERROR
-------------------------------------------------------------
-
-If you receive:
-
-ModuleNotFoundError
-
-or Pylance reports:
-
-Import "package" could not be resolved
-
-Run:
-
-.\.venv\Scripts\Activate.ps1
-
-python -m pip install -r requirements.txt
-
-Then verify:
-
-python -c "import numpy, pandas, sklearn, xgboost, optuna, joblib; print('Environment OK')"
-
-
-DATASET NOT FOUND
-------------------------------------------------------------
-
-Check:
-
-data/raw/
-
-and compare the filename with the path configured in:
-
-src/common.py
-
-
-OUTPUT NOT FOUND
-------------------------------------------------------------
-
-Check:
-
-results/
-
-and:
-
-models/
-
-If no output was generated, check the terminal for an error.
-
-Do not manually create fake result files.
-
-
-WRONG PYTHON INTERPRETER
-------------------------------------------------------------
-
-Run:
-
-python -c "import sys; print(sys.executable)"
-
-The output should point to:
-
-.venv\Scripts\python.exe
-
-
-============================================================
-22. GIT
-============================================================
-
-The virtual environment should NOT be committed.
-
-Make sure .gitignore contains:
-
-.venv/
-
-
-Check repository status:
-
-git status
-
-
-Add changes:
-
-git add .
-
-
-Commit:
-
-git commit -m "Update phishing classifier optimization pipeline"
-
-
-Push:
-
-git push
-
-
-============================================================
-23. REPRODUCIBILITY
-============================================================
-
-The experiment must be reproducible.
-
-Keep shared configuration inside:
-
-src/common.py
-
-Use a fixed random seed where required by the methodology.
-
-Do not manually modify generated results.
-
-If the configuration or methodology changes, rerun the affected
-experiments.
-
-Keep baseline, GridSearchCV, and Optuna results separate.
-
-
-============================================================
-24. FINAL EXPERIMENT FLOW
-============================================================
-
-RAW DATA
-    |
-    v
-data/raw/
-    |
-    v
-01_preprocess.py
-    |
-    +--------------------+
-    |                    |
-    v                    v
-data/processed/    results/preprocessing/
-    |
-    +----------------------+
-    |                      |
-    v                      v
-02_baseline.py       baseline results
-    |
-    +----------------------+
-    |                      |
-    v                      v
-models/baseline/    results/baseline/
-    |
-    +----------------------+
-    |
-    +----> 03_gridsearch.py
-    |              |
-    |              +----> models/gridsearch/
-    |              |
-    |              +----> results/gridsearch/
-    |
-    +----> 04_optuna.py
-                   |
-                   +----> models/optuna/
-                   |
-                   +----> results/optuna/
-
-                         |
-                         v
-                 05_evaluate.py
-                         |
-                         v
-                 results/evaluation/
-
-
-============================================================
-25. QUICK START
-============================================================
-
-From:
-
-phishing-classifier-optimization/
-
-run:
-
-.\.venv\Scripts\Activate.ps1
-
-python -m pip install -r requirements.txt
-
-python -c "import numpy, pandas, sklearn, xgboost, optuna, joblib; print('Environment OK')"
-
-python src/01_preprocess.py
-
-python src/02_baseline.py
-
-python src/03_gridsearch.py
-
-python src/04_optuna.py
-
-python src/05_evaluate.py
+python src/train_optuna.py
 
 
 ============================================================
