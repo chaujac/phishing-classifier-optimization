@@ -14,7 +14,7 @@ SPLIT_DIR = DATA_DIR / "processed"
 MODEL_DIR = BASE_DIR / "models"
 RESULT_DIR = BASE_DIR / "results"
 
-# Add these explicit sub-directory paths
+# Sub-directories for organized outputs
 TRAINING_RESULT_DIR = RESULT_DIR / "training"
 EVALUATION_RESULT_DIR = RESULT_DIR / "evaluation"
 PREPROCESSING_RESULT_DIR = RESULT_DIR / "preprocessing"
@@ -183,7 +183,7 @@ def load_split(dataset_name):
     if not path.exists():
         raise FileNotFoundError(
             f"Canonical split not found for '{dataset_name}'. "
-            f"Run train_baseline.py first."
+            f"Run data_preprocessing.py first."
         )
 
     return joblib.load(path)
