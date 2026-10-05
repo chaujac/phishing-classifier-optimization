@@ -1,3 +1,4 @@
+import sys
 import subprocess
 from common import DATASETS, EXPERIMENTS
 
@@ -6,16 +7,23 @@ def run_batch_evaluation():
     
     for dataset_name in DATASETS.keys():
         for exp_key, exp_info in EXPERIMENTS.items():
-            classifier_slug = exp_info["classifier"].lower().replace(" ", "_")
+            classifier_name = exp_info["classifier"]
             
-            # Reconstruct the expected model filename based on your convention
+            # Match your exact .joblib filename convention (e.g., random_forest or xgboost)
+            if classifier_name == "RandomForest":
+                classifier_slug = "random_forest"
+            elif classifier_name == "XGBoost":
+                classifier_slug = "xgboost"
+            else:
+                classifier_slug = classifier_name.lower().replace(" ", "_")
+            
             model_filename = f"{dataset_name}_{exp_key}_{classifier_slug}.joblib"
             
             print(f"\nEvaluating -> Dataset: {dataset_name} | Experiment: {exp_key} | Model: {model_filename}")
             
-            # Construct command for evaluate.py
+            # Use sys.executable to guarantee the active virtual environment is used
             cmd = [
-                "python", 
+                sys.executable, 
                 "src/evaluate.py", 
                 "--dataset", dataset_name, 
                 "--experiment", exp_key, 
