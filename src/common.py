@@ -9,9 +9,10 @@ import joblib
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DATA_DIR = BASE_DIR / "data"
+RAW_DIR = DATA_DIR / "raw"
+SPLIT_DIR = DATA_DIR / "processed"  # Outputs splits to data/processed/ instead of splits/
 MODEL_DIR = BASE_DIR / "models"
 RESULT_DIR = BASE_DIR / "results"
-SPLIT_DIR = BASE_DIR / "splits"
 
 
 # ============================================================
@@ -29,10 +30,13 @@ N_OPTUNA_TRIALS = 50
 # ============================================================
 
 DATASETS = {
-    "uci": DATA_DIR / "uci_phishing.csv",
-    "web_page": DATA_DIR / "web_page_phishing.csv",
-    "phiusil": DATA_DIR / "phiusil.csv",
-    "zenodo": DATA_DIR / "zenodo_phishing.csv",
+    "uci": RAW_DIR / "uci-ml-phishing-dataset.csv",
+    "web_page": RAW_DIR / "mendeley-web-page-phishing-detection.dataset.csv",
+    "phiusil": RAW_DIR / "phiusiil-phishing-url-dataset.csv",
+    "zenodo": [
+        RAW_DIR / "zenodo-not-phishing.csv",
+        RAW_DIR / "zenodo-phishing.csv"
+    ],
 }
 
 
