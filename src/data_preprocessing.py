@@ -115,7 +115,6 @@ def find_target_column(df, dataset_name):
         f"Could not identify target column for {dataset_name}. "
         f"Available columns: {list(df.columns)}"
     )
-
 # ============================================================
 # TARGET NORMALIZATION
 # ============================================================
@@ -123,8 +122,16 @@ def find_target_column(df, dataset_name):
 def normalize_target(series, dataset_name):
     target = series.copy()
 
-    # 1. Handle string/object labels first (crucial for web_page / Mendeley)
-    if target.dtype == object or str(target.dtype).startswith("string") or target.dtype.name == 'category':
+    # Safely check if the column contains text/categorical strings
+    sample_val = target.dropna().iloc[0] if len(target.dropna()) > 0 else None
+    is_string_type = (
+        isinstance(sample_val, str) or 
+        target.dtype == object or 
+        target.dtype.name.startswith("category") or 
+        target.dtype.name.startswith("string")
+    )
+
+    if is_string_type:
         normalized = (
             target.astype(str)
             .str.strip()
@@ -166,7 +173,7 @@ def normalize_target(series, dataset_name):
 
         return result.astype(int)
 
-    # 2. Handle numeric labels for UCI, PhiUSIIL, and Zenodo
+    # Handle numeric labels for UCI, PhiUSIIL, and Zenodo
     numeric = pd.to_numeric(target, errors="coerce")
 
     if numeric.isna().any():
@@ -199,7 +206,6 @@ def normalize_target(series, dataset_name):
         f"Unsupported target encoding for {dataset_name}: "
         f"{sorted(unique_values)}"
     )
-
 
 # ============================================================
 # DUPLICATE REMOVAL
