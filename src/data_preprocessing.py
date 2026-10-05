@@ -66,22 +66,28 @@ def load_dataset(dataset_name):
     if dataset_name not in DATASETS:
         raise ValueError(f"Unknown dataset: {dataset_name}")
 
-    path = DATASETS[dataset_name]
+    paths = DATASETS[dataset_name]
 
-    if not path.exists():
-        raise FileNotFoundError(
-            f"Dataset not found: {path}"
-        )
+    # Handle datasets split across multiple files (e.g., Zenodo)
+    if isinstance(paths, list):
+        dataframes = []
+        for path in paths:
+            if not path.exists():
+                raise FileNotFoundError(f"Dataset file not found: {path}")
+            dataframes.append(pd.read_csv(path))
+        return pd.concat(dataframes, ignore_index=True)
 
-    if path.suffix.lower() == ".csv":
-        return pd.read_csv(path)
+    # Handle single file datasets
+    if not paths.exists():
+        raise FileNotFoundError(f"Dataset not found: {paths}")
 
-    if path.suffix.lower() in [".xlsx", ".xls"]:
-        return pd.read_excel(path)
+    if paths.suffix.lower() == ".csv":
+        return pd.read_csv(paths)
 
-    raise ValueError(
-        f"Unsupported file format: {path.suffix}"
-    )
+    if paths.suffix.lower() in [".xlsx", ".xls"]:
+        return pd.read_excel(paths)
+
+    raise ValueError(f"Unsupported file format: {paths.suffix}")
 
 
 # ============================================================
