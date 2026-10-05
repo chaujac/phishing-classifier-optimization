@@ -1,0 +1,16 @@
+{
+    "dataset": "phiusil",
+    "experiment": "E5",
+    "classifier": "XGBoost",
+    "optimizer": "GridSearchCV",
+    "cv_folds": 5,
+    "best_cv_accuracy": 0.9999893977947412,
+    "best_parameters": {
+        "colsample_bytree": 0.8,
+        "learning_rate": 0.1,
+        "max_depth": 5,
+        "n_estimators": 100,
+        "subsample": 1.0
+    },
+    "optimization_time_seconds": 250.80507889999717
+}

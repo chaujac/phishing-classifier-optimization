@@ -1,0 +1,16 @@
+{
+    "dataset": "web_page",
+    "experiment": "E5",
+    "classifier": "XGBoost",
+    "optimizer": "GridSearchCV",
+    "cv_folds": 5,
+    "best_cv_accuracy": 0.9702545782571816,
+    "best_parameters": {
+        "colsample_bytree": 0.8,
+        "learning_rate": 0.1,
+        "max_depth": 7,
+        "n_estimators": 300,
+        "subsample": 1.0
+    },
+    "optimization_time_seconds": 56.528021300000546
+}

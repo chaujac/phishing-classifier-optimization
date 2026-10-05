@@ -1,0 +1,16 @@
+{
+    "dataset": "uci",
+    "experiment": "E5",
+    "classifier": "XGBoost",
+    "optimizer": "GridSearchCV",
+    "cv_folds": 5,
+    "best_cv_accuracy": 0.9701494312557392,
+    "best_parameters": {
+        "colsample_bytree": 0.8,
+        "learning_rate": 0.2,
+        "max_depth": 7,
+        "n_estimators": 300,
+        "subsample": 1.0
+    },
+    "optimization_time_seconds": 18.56622910000442
+}

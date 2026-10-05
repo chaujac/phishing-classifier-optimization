@@ -1,0 +1,16 @@
+{
+    "dataset": "web_page",
+    "experiment": "E2",
+    "classifier": "Random Forest",
+    "optimizer": "GridSearchCV",
+    "cv_folds": 5,
+    "best_cv_accuracy": 0.9674111955092582,
+    "best_parameters": {
+        "max_depth": null,
+        "max_features": "log2",
+        "min_samples_leaf": 1,
+        "min_samples_split": 2,
+        "n_estimators": 200
+    },
+    "optimization_time_seconds": 146.4013038999983
+}

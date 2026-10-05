@@ -1,0 +1,16 @@
+{
+    "dataset": "phiusil",
+    "experiment": "E2",
+    "classifier": "Random Forest",
+    "optimizer": "GridSearchCV",
+    "cv_folds": 5,
+    "best_cv_accuracy": 1.0,
+    "best_parameters": {
+        "max_depth": 10,
+        "max_features": "sqrt",
+        "min_samples_leaf": 1,
+        "min_samples_split": 5,
+        "n_estimators": 100
+    },
+    "optimization_time_seconds": 2790.2432980000012
+}
