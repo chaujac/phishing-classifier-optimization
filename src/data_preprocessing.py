@@ -74,7 +74,17 @@ def load_dataset(dataset_name):
         for path in paths:
             if not path.exists():
                 raise FileNotFoundError(f"Dataset file not found: {path}")
-            dataframes.append(pd.read_csv(path))
+            
+            df = pd.read_csv(path)
+            
+            # Inject labels for Zenodo based on the filename before concatenating
+            if "not-phishing" in path.name.lower():
+                df["label"] = 0
+            elif "phishing" in path.name.lower():
+                df["label"] = 1
+                
+            dataframes.append(df)
+            
         return pd.concat(dataframes, ignore_index=True)
 
     # Handle single file datasets
@@ -295,11 +305,17 @@ def remove_non_predictive_columns(df, dataset_name):
 # ============================================================
 
 def convert_predictors_to_numeric(X):
+    # Include both numbers and booleans
     numeric_columns = X.select_dtypes(
-        include=[np.number]
+        include=[np.number, bool]
     ).columns
 
     X = X[numeric_columns].copy()
+    
+    # Convert any boolean columns to integers (0 and 1) for XGBoost
+    bool_cols = X.select_dtypes(include=[bool]).columns
+    for col in bool_cols:
+        X[col] = X[col].astype(int)
 
     X = X.replace(
         [np.inf, -np.inf],
@@ -307,7 +323,6 @@ def convert_predictors_to_numeric(X):
     )
 
     return X
-
 
 # ============================================================
 # MISSING VALUE HANDLING
