@@ -22,7 +22,7 @@ def verify_dataset(name, df, expected_rows, expected_features):
 
 # 1. UCI Phishing Websites Dataset (Expected: ~11,055 rows, 30 features)
 try:
-    data, meta = arff.loadarff('data/raw/Training Dataset.arff') # Adjust filename
+    data, meta = arff.loadarff('data/raw/uci-ml-phishing-dataset.csv') 
     df_uci = pd.DataFrame(data)
     verify_dataset("UCI Phishing Websites", df_uci, 11055, 31)
 except Exception as e:
@@ -30,14 +30,14 @@ except Exception as e:
 
 # 2. Web Page Phishing Detection Dataset (Expected: ~11,430 rows, 87 features)
 try:
-    df_web = pd.read_csv('data/raw/dataset_phishing.csv') # Adjust filename
+    df_web = pd.read_csv('data/raw/mendeley-web-page-phishing-detection-dataset.csv') 
     verify_dataset("Web Page Phishing", df_web, 11430, 88)
 except Exception as e:
     print(f"Web Page Check Failed: {e}")
 
 # 3. PhiUSIIL Phishing URL Dataset (Expected: ~235,795 rows, 54 features)
 try:
-    df_phi = pd.read_csv('data/raw/PhiUSIIL_Phishing_URL_Dataset.csv') # Adjust filename
+    df_phi = pd.read_csv('data/raw/phiusiil-phishing-url-dataset.csv') 
     verify_dataset("PhiUSIIL Dataset", df_phi, 235795, 55)
 except Exception as e:
     print(f"PhiUSIIL Check Failed: {e}")
@@ -51,4 +51,3 @@ try:
 except Exception as e:
     print(f"Zenodo Check Failed: {e}")
 
-    
