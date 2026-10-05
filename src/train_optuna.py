@@ -1,4 +1,5 @@
 import time
+import json
 
 import optuna
 
@@ -13,7 +14,7 @@ from xgboost import XGBClassifier
 from common import (
     DATASETS,
     MODEL_DIR,
-    RESULT_DIR,
+    TRAINING_RESULT_DIR,
     RANDOM_STATE,
     CV_FOLDS,
     N_OPTUNA_TRIALS,
@@ -22,11 +23,6 @@ from common import (
     ensure_directories,
     save_model,
     save_json,
-)
-
-save_json(
-    metadata,
-    TRAINING_RESULT_DIR / f"{dataset_name}_E3_training.json", # (or E6)
 )
 from data_preprocessing import get_dataset_split
 
@@ -257,7 +253,7 @@ def train_random_forest(dataset_name):
 
     save_json(
         metadata,
-        RESULT_DIR
+        TRAINING_RESULT_DIR
         / f"{dataset_name}_E3_training.json",
     )
 
@@ -318,7 +314,7 @@ def train_xgboost(dataset_name):
 
     save_json(
         metadata,
-        RESULT_DIR
+        TRAINING_RESULT_DIR
         / f"{dataset_name}_E6_training.json",
     )
 
