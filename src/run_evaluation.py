@@ -2,6 +2,13 @@ import sys
 import subprocess
 from common import DATASETS, EXPERIMENTS, MODEL_DIR
 
+import warnings
+from sklearn.exceptions import ConvergenceWarning
+
+# Suppress sklearn parallel and joblib memory mapping warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="sklearn.utils.parallel")
+warnings.filterwarnings("ignore", category=UserWarning, module="joblib")
+
 def run_batch_evaluation():
     print("Starting automated batch evaluation for available trained models...")
     

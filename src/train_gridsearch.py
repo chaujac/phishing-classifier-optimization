@@ -1,6 +1,13 @@
 import time
 import json
 
+import warnings
+from sklearn.exceptions import ConvergenceWarning
+
+# Suppress sklearn parallel and joblib memory mapping warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="sklearn.utils.parallel")
+warnings.filterwarnings("ignore", category=UserWarning, module="joblib")
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import StratifiedKFold, GridSearchCV
 from xgboost import XGBClassifier
@@ -18,6 +25,7 @@ from common import (
     save_json,
 )
 from data_preprocessing import get_dataset_split
+
 
 
 # ============================================================
