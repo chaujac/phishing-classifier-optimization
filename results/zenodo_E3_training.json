@@ -1,0 +1,18 @@
+{
+    "dataset": "zenodo",
+    "experiment": "E3",
+    "classifier": "Random Forest",
+    "optimizer": "Optuna",
+    "sampler": "TPE",
+    "trials": 50,
+    "cv_folds": 5,
+    "best_cv_accuracy": 0.8427118506868958,
+    "best_parameters": {
+        "n_estimators": 181,
+        "max_depth": 23,
+        "min_samples_split": 3,
+        "min_samples_leaf": 1,
+        "max_features": "log2"
+    },
+    "optimization_time_seconds": 39.551042599996435
+}

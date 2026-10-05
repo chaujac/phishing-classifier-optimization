@@ -1,0 +1,18 @@
+{
+    "dataset": "web_page",
+    "experiment": "E3",
+    "classifier": "Random Forest",
+    "optimizer": "Optuna",
+    "sampler": "TPE",
+    "trials": 50,
+    "cv_folds": 5,
+    "best_cv_accuracy": 0.9674112553283891,
+    "best_parameters": {
+        "n_estimators": 198,
+        "max_depth": 28,
+        "min_samples_split": 2,
+        "min_samples_leaf": 1,
+        "max_features": "log2"
+    },
+    "optimization_time_seconds": 98.71851450000395
+}

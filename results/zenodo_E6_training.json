@@ -1,0 +1,18 @@
+{
+    "dataset": "zenodo",
+    "experiment": "E6",
+    "classifier": "XGBoost",
+    "optimizer": "Optuna",
+    "sampler": "TPE",
+    "trials": 50,
+    "cv_folds": 5,
+    "best_cv_accuracy": 0.8494464504602434,
+    "best_parameters": {
+        "n_estimators": 203,
+        "learning_rate": 0.16431084564727144,
+        "max_depth": 7,
+        "subsample": 0.8423944755397006,
+        "colsample_bytree": 0.8547955199032856
+    },
+    "optimization_time_seconds": 11.823871700005839
+}

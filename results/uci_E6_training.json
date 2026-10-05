@@ -1,0 +1,18 @@
+{
+    "dataset": "uci",
+    "experiment": "E6",
+    "classifier": "XGBoost",
+    "optimizer": "Optuna",
+    "sampler": "TPE",
+    "trials": 50,
+    "cv_folds": 5,
+    "best_cv_accuracy": 0.9703752919178716,
+    "best_parameters": {
+        "n_estimators": 277,
+        "learning_rate": 0.16150522955308336,
+        "max_depth": 7,
+        "subsample": 0.9566046486314497,
+        "colsample_bytree": 0.8229573280888937
+    },
+    "optimization_time_seconds": 22.01088460000028
+}

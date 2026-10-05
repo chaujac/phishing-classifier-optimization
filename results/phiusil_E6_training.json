@@ -1,0 +1,18 @@
+{
+    "dataset": "phiusil",
+    "experiment": "E6",
+    "classifier": "XGBoost",
+    "optimizer": "Optuna",
+    "sampler": "TPE",
+    "trials": 50,
+    "cv_folds": 5,
+    "best_cv_accuracy": 0.9999893977947412,
+    "best_parameters": {
+        "n_estimators": 175,
+        "learning_rate": 0.19063571821788408,
+        "max_depth": 6,
+        "subsample": 0.9197316968394074,
+        "colsample_bytree": 0.8312037280884873
+    },
+    "optimization_time_seconds": 228.64321710000513
+}
