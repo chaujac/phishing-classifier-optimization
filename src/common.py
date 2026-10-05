@@ -31,7 +31,7 @@ N_OPTUNA_TRIALS = 50
 
 DATASETS = {
     "uci": RAW_DIR / "uci-ml-phishing-dataset.csv",
-    "web_page": RAW_DIR / "mendeley-web-page-phishing-detection.dataset.csv",
+    "web_page": RAW_DIR / "mendeley-web-page-phishing-detection-dataset.csv",
     "phiusil": RAW_DIR / "phiusiil-phishing-url-dataset.csv",
     "zenodo": [
         RAW_DIR / "zenodo-not-phishing.csv",

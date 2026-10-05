@@ -28,7 +28,7 @@ phishing-classifier-optimization/
 |
 |-- data/
 |   |-- raw/
-|   |   |-- mendeley-web-page-phishing-detection.dataset.csv
+|   |   |-- mendeley-web-page-phishing-detection-dataset.csv
 |   |   |-- phiusiil-phishing-url-dataset.csv
 |   |   |-- uci-ml-phishing-dataset.csv
 |   |   |-- zenodo-not-phishing.csv
