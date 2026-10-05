@@ -116,7 +116,6 @@ def find_target_column(df, dataset_name):
         f"Available columns: {list(df.columns)}"
     )
 
-
 # ============================================================
 # TARGET NORMALIZATION
 # ============================================================
@@ -124,8 +123,8 @@ def find_target_column(df, dataset_name):
 def normalize_target(series, dataset_name):
     target = series.copy()
 
-    # Handle string labels
-    if target.dtype == "object" or str(target.dtype).startswith("string"):
+    # 1. Handle string/object labels first (crucial for web_page / Mendeley)
+    if target.dtype == object or str(target.dtype).startswith("string") or target.dtype.name == 'category':
         normalized = (
             target.astype(str)
             .str.strip()
@@ -137,6 +136,7 @@ def normalize_target(series, dataset_name):
             "phish",
             "malicious",
             "1",
+            "1.0",
             "true",
         }
 
@@ -145,6 +145,7 @@ def normalize_target(series, dataset_name):
             "legit",
             "benign",
             "0",
+            "0.0",
             "false",
         }
 
@@ -159,13 +160,13 @@ def normalize_target(series, dataset_name):
 
         if result.isna().any():
             unknown = normalized[result.isna()].unique()
-
             raise ValueError(
                 f"Unknown target labels in {dataset_name}: {unknown}"
             )
 
         return result.astype(int)
 
+    # 2. Handle numeric labels for UCI, PhiUSIIL, and Zenodo
     numeric = pd.to_numeric(target, errors="coerce")
 
     if numeric.isna().any():
@@ -176,25 +177,21 @@ def normalize_target(series, dataset_name):
 
     unique_values = set(numeric.unique())
 
-    # UCI Phishing Websites Dataset:
-    # -1 = phishing
-    #  1 = legitimate
+    # UCI Phishing Websites Dataset: -1 = phishing, 1 = legitimate
     if dataset_name == "uci" and unique_values == {-1, 1}:
         return numeric.map({
             -1: 1,
             1: 0,
         }).astype(int)
 
-    # PhiUSIIL:
-    # 1 = legitimate
-    # 0 = phishing
+    # PhiUSIIL: 1 = legitimate, 0 = phishing
     if dataset_name == "phiusil" and unique_values == {0, 1}:
         return numeric.map({
             0: 1,
             1: 0,
         }).astype(int)
 
-    # Already normalized
+    # Already normalized (e.g., Zenodo: 0 and 1)
     if unique_values == {0, 1}:
         return numeric.astype(int)
 
