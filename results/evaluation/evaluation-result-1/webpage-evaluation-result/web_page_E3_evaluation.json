@@ -1,0 +1,57 @@
+{
+    "dataset": "web_page",
+    "experiment": "E3",
+    "model": "web_page_E3_random_forest.joblib",
+    "classification": {
+        "threshold": 0.5,
+        "accuracy": 0.9619422572178478,
+        "macro_precision": 0.9620218278028883,
+        "macro_recall": 0.9619422572178478,
+        "macro_f1": 0.9619406185467578,
+        "per_class": {
+            "Legitimate": {
+                "precision": 0.9680851063829787,
+                "recall": 0.9553805774278216,
+                "f1-score": 0.9616908850726552,
+                "support": 1143.0
+            },
+            "Phishing": {
+                "precision": 0.9559585492227979,
+                "recall": 0.968503937007874,
+                "f1-score": 0.9621903520208605,
+                "support": 1143.0
+            },
+            "accuracy": 0.9619422572178478,
+            "macro avg": {
+                "precision": 0.9620218278028883,
+                "recall": 0.9619422572178478,
+                "f1-score": 0.9619406185467578,
+                "support": 2286.0
+            },
+            "weighted avg": {
+                "precision": 0.9620218278028883,
+                "recall": 0.9619422572178478,
+                "f1-score": 0.9619406185467578,
+                "support": 2286.0
+            }
+        },
+        "confusion_matrix": [
+            [
+                1092,
+                51
+            ],
+            [
+                36,
+                1107
+            ]
+        ]
+    },
+    "inference": {
+        "sample_count": 1000,
+        "warmup_count": 10,
+        "mean_ms": 22.265654300044844,
+        "std_ms": 3.9099404954245163,
+        "peak_memory_bytes": 737896,
+        "peak_memory_mb": 0.7037124633789062
+    }
+}

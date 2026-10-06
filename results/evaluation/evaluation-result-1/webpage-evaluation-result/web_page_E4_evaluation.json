@@ -1,0 +1,57 @@
+{
+    "dataset": "web_page",
+    "experiment": "E4",
+    "model": "web_page_E4_xgboost.joblib",
+    "classification": {
+        "threshold": 0.5,
+        "accuracy": 0.9671916010498688,
+        "macro_precision": 0.9672091243110839,
+        "macro_recall": 0.9671916010498688,
+        "macro_f1": 0.9671912934169986,
+        "per_class": {
+            "Legitimate": {
+                "precision": 0.9700704225352113,
+                "recall": 0.9641294838145232,
+                "f1-score": 0.9670908293111014,
+                "support": 1143.0
+            },
+            "Phishing": {
+                "precision": 0.9643478260869566,
+                "recall": 0.9702537182852143,
+                "f1-score": 0.9672917575228958,
+                "support": 1143.0
+            },
+            "accuracy": 0.9671916010498688,
+            "macro avg": {
+                "precision": 0.9672091243110839,
+                "recall": 0.9671916010498688,
+                "f1-score": 0.9671912934169986,
+                "support": 2286.0
+            },
+            "weighted avg": {
+                "precision": 0.9672091243110839,
+                "recall": 0.9671916010498688,
+                "f1-score": 0.9671912934169987,
+                "support": 2286.0
+            }
+        },
+        "confusion_matrix": [
+            [
+                1102,
+                41
+            ],
+            [
+                34,
+                1109
+            ]
+        ]
+    },
+    "inference": {
+        "sample_count": 1000,
+        "warmup_count": 10,
+        "mean_ms": 15.43677090008714,
+        "std_ms": 2.0335853151372496,
+        "peak_memory_bytes": 854336,
+        "peak_memory_mb": 0.81475830078125
+    }
+}
