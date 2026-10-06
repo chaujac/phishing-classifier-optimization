@@ -34,10 +34,10 @@ phishing-classifier-optimization/
 |   |   |-- zenodo-not-phishing.csv
 |   |   |-- zenodo-phishing.csv
 |   |-- processed/
-|   |   |-- uci_split.joblib
-|   |   |-- web_page_split.joblib
-|   |   |-- phiusil_split.joblib
-|   |   |-- zenodo_split.joblib
+|       |-- uci_split.joblib
+|       |-- web_page_split.joblib
+|       |-- phiusil_split.joblib
+|       |-- zenodo_split.joblib
 |
 |-- models/
 |   |-- uci_E1_random_forest.joblib
@@ -52,8 +52,11 @@ phishing-classifier-optimization/
 |   |   |-- uci_E3_training.json
 |   |   |-- ... (training metadata and best parameters)
 |   |-- evaluation/
-|       |-- uci_E1_evaluation.json
-|       |-- ... (final evaluation performance reports)
+|       |-- evaluation-result-1/
+|           |-- phiusil-evaluation-result/
+|           |-- uci-evaluation-result/
+|           |-- webpage-evaluation-result/
+|           |-- zenodo-evaluation-result/
 |
 |-- src/
 |   |-- common.py
@@ -62,6 +65,7 @@ phishing-classifier-optimization/
 |   |-- train_baseline.py
 |   |-- train_gridsearch.py
 |   |-- train_optuna.py
+|   |-- run_evaluation.py
 |   
 |-- requirements.txt
 |-- instructions.txt
@@ -95,11 +99,8 @@ python src/train_gridsearch.py
 4. Optuna Optimization (E3, E6):
 python src/train_optuna.py
 
-5. Model Evaluation (Run per dataset and experiment model):
-python src/evaluate.py --dataset <dataset_name> --experiment <E1-E6> --model <model_filename>
-
-Example:
-python src/evaluate.py --dataset uci --experiment E1 --model uci_E1_random_forest.joblib
+5. Model Evaluation (Batch runner):
+python src/run_evaluation.py
 
 
 ============================================================
@@ -109,7 +110,7 @@ python src/evaluate.py --dataset uci --experiment E1 --model uci_E1_random_fores
 - Processed Splits: data/processed/{dataset}_split.joblib
 - Trained Models: models/{dataset}_{experiment}_{classifier_name}.joblib
 - Training Logs: results/training/{dataset}_{experiment}_training.json
-- Evaluation Reports: results/evaluation/{dataset}_{experiment}_evaluation.json
+- Evaluation Reports: results/evaluation/evaluation-result-1/{dataset}-evaluation-result/
 
 
 ============================================================
