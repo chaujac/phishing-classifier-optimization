@@ -1,0 +1,57 @@
+{
+    "dataset": "uci",
+    "experiment": "E1",
+    "model": "uci_E1_random_forest.joblib",
+    "classification": {
+        "threshold": 0.5,
+        "accuracy": 0.9755766621438263,
+        "macro_precision": 0.9759934146523984,
+        "macro_recall": 0.9745295843763988,
+        "macro_f1": 0.9752207004301936,
+        "per_class": {
+            "Legitimate": {
+                "precision": 0.9726907630522088,
+                "recall": 0.983753046303818,
+                "f1-score": 0.9781906300484653,
+                "support": 1231.0
+            },
+            "Phishing": {
+                "precision": 0.979296066252588,
+                "recall": 0.9653061224489796,
+                "f1-score": 0.9722507708119219,
+                "support": 980.0
+            },
+            "accuracy": 0.9755766621438263,
+            "macro avg": {
+                "precision": 0.9759934146523984,
+                "recall": 0.9745295843763988,
+                "f1-score": 0.9752207004301936,
+                "support": 2211.0
+            },
+            "weighted avg": {
+                "precision": 0.9756184867683424,
+                "recall": 0.9755766621438263,
+                "f1-score": 0.9755578566193325,
+                "support": 2211.0
+            }
+        },
+        "confusion_matrix": [
+            [
+                1211,
+                20
+            ],
+            [
+                34,
+                946
+            ]
+        ]
+    },
+    "inference": {
+        "sample_count": 1000,
+        "warmup_count": 10,
+        "mean_ms": 9.92389429994364,
+        "std_ms": 1.890259168207843,
+        "peak_memory_bytes": 749531,
+        "peak_memory_mb": 0.714808464050293
+    }
+}
