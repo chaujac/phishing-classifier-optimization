@@ -1,0 +1,57 @@
+{
+    "dataset": "uci",
+    "experiment": "E6",
+    "model": "uci_E6_xgboost.joblib",
+    "classification": {
+        "threshold": 0.5,
+        "accuracy": 0.9769335142469471,
+        "macro_precision": 0.9774311995276075,
+        "macro_recall": 0.9758521361428406,
+        "macro_f1": 0.9765947488098734,
+        "per_class": {
+            "Legitimate": {
+                "precision": 0.9735152487961477,
+                "recall": 0.9853777416734363,
+                "f1-score": 0.9794105773112636,
+                "support": 1231.0
+            },
+            "Phishing": {
+                "precision": 0.9813471502590674,
+                "recall": 0.9663265306122449,
+                "f1-score": 0.9737789203084833,
+                "support": 980.0
+            },
+            "accuracy": 0.9769335142469471,
+            "macro avg": {
+                "precision": 0.9774311995276075,
+                "recall": 0.9758521361428406,
+                "f1-score": 0.9765947488098734,
+                "support": 2211.0
+            },
+            "weighted avg": {
+                "precision": 0.9769866479068042,
+                "recall": 0.9769335142469471,
+                "f1-score": 0.9769144109328264,
+                "support": 2211.0
+            }
+        },
+        "confusion_matrix": [
+            [
+                1213,
+                18
+            ],
+            [
+                33,
+                947
+            ]
+        ]
+    },
+    "inference": {
+        "sample_count": 1000,
+        "warmup_count": 10,
+        "mean_ms": 6.319895899978292,
+        "std_ms": 1.594335152136552,
+        "peak_memory_bytes": 760700,
+        "peak_memory_mb": 0.7254600524902344
+    }
+}
